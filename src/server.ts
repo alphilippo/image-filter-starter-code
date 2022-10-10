@@ -29,19 +29,21 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   /**************************************************************************** */
   app.get( "/filteredimage/", async ( req, res ) => {
-    let { image_url } = req.params;
+    const { image_url } = req.query;
 
-    let filteredpath;
-
-    filterImageFromURL(image_url).then(res => {
-      filteredpath = res;
-    })
-
-    if (filteredpath) {
-      res.sendFile(filteredpath);
+    if (image_url) {
+      try {
+        let filteredpath =  await filterImageFromURL(image_url);
+        return res.status(200).sendFile(filteredpath);
+      } catch (error) {
+        return res.status(422).send(error);
+      }
     }
-    
-  } );
+    else {
+      res.status(404).send('image_url not provided');
+    }
+  } 
+);
 
   //! END @TODO1
   
